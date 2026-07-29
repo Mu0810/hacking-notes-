@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ethical Hacking · Interactive Field Notes</title>
+<meta name="description" content="An interactive cheat sheet for ethical hacking: phases, reconnaissance, scanning, tooling, attack classes, principles and the CIA triad." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%94%92%3C/text%3E%3C/svg%3E" />
+</head>
+<body>
+
+<!-- BOOT OVERLAY -->
+<div id="boot" class="boot">
+  <div class="boot-inner">
+    <pre class="boot-log" id="bootLog"></pre>
+    <div class="boot-bar"><span id="bootBar"></span></div>
+    <button class="boot-skip" id="bootSkip">skip [esc]</button>
+  </div>
+</div>
+
+<canvas id="matrix" class="matrix" aria-hidden="true"></canvas>
+<div class="grid-overlay" aria-hidden="true"></div>
+<div class="scanline" aria-hidden="true"></div>
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <a class="brand" href="#top">
+    <span class="brand-lock">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+        <path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <rect x="4" y="10" width="16" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="15.5" r="1.4" fill="currentColor"/>
+        <path d="M12 16.6v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="brand-text">ETHICAL<span class="accent">HACKING</span></span>
+  </a>
+
+  <nav class="nav-links" id="navLinks" aria-label="Sections">
+    <a href="#intro">Intro</a>
+    <a href="#phases">Phases</a>
+    <a href="#recon">Recon</a>
+    <a href="#scanning">Scanning</a>
+    <a href="#tools">Tools</a>
+    <a href="#attacks">Attacks</a>
+    <a href="#cia">CIA Triad</a>
+    <a href="#quiz">Quiz</a>
+  </nav>
+
+  <div class="nav-actions">
+    <button id="searchBtn" class="ghost-btn" title="Search everything (press /)">
+      <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span class="kbd">/</span>
+    </button>
+    <button id="themeBtn" class="ghost-btn" title="Cycle accent colour">
+      <span class="swatch" aria-hidden="true"></span>
+    </button>
+    <button class="burger" id="burger" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- SEARCH PALETTE -->
+<div class="palette" id="palette" hidden>
+  <div class="palette-box">
+    <div class="palette-input">
+      <span class="prompt">&gt;</span>
+      <input id="paletteInput" type="text" placeholder="search phases, tools, attacks, terms…" autocomplete="off" spellcheck="false" />
+      <span class="kbd esc">esc</span>
+    </div>
+    <ul class="palette-results" id="paletteResults"></ul>
+  </div>
+</div>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="badge"><span class="dot"></span> authorized engagement · scope confirmed</div>
+    <h1 class="hero-title">
+      <span class="glitch" data-text="ETHICAL">ETHICAL</span>
+      <span class="glitch delay" data-text="HACKING">HACKING</span>
+    </h1>
+    <p class="hero-type"><span id="typeTarget"></span><span class="caret" aria-hidden="true"></span></p>
+    <p class="hero-sub">
+      Legally breaking into systems, networks and applications to find the vulnerabilities
+      malicious hackers would exploit — then helping fix them first.
+    </p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#phases">Explore the 6 phases</a>
+      <a class="btn" href="#tools">Tooling arsenal</a>
+    </div>
+
+    <dl class="hero-stats">
+      <div><dt>Phases</dt><dd data-count="6">0</dd></div>
+      <div><dt>Core tools</dt><dd data-count="9">0</dd></div>
+      <div><dt>Attack classes</dt><dd data-count="5">0</dd></div>
+      <div><dt>Principles</dt><dd data-count="5">0</dd></div>
+    </dl>
+  </div>
+
+  <aside class="hero-terminal" aria-label="Sample terminal session">
+    <div class="term-bar"><span class="d r"></span><span class="d y"></span><span class="d g"></span><em>~/engagements/acme-corp</em></div>
+    <pre class="term-body" id="termBody"></pre>
+  </aside>
+
+  <div class="scroll-hint" aria-hidden="true"><span></span>scroll</div>
+</section>
+
+<!-- INTRO + TERMS -->
+<section id="intro" class="section">
+  <div class="sec-head">
+    <span class="sec-num">01</span>
+    <h2>Introduction &amp; Key Terms</h2>
+    <p class="sec-lead">The vocabulary that separates a professional from a trespasser.</p>
+  </div>
+
+  <div class="two-col">
+    <article class="card reveal">
+      <h3 class="card-title">What it is</h3>
+      <ul class="tick-list">
+        <li><b>Ethical hacking</b> is the process of <em>legally</em> breaking into systems, networks or applications to find vulnerabilities that malicious hackers can exploit.</li>
+        <li><b>Goal</b> — identify weaknesses and help organizations fix them <em>before</em> attackers do.</li>
+        <li><b>Also called</b> — penetration testing.</li>
+      </ul>
+      <blockquote class="motto">
+        <span>MOTTO</span>
+        “Think like a hacker, act like a professional.”
+      </blockquote>
+    </article>
+
+    <article class="card reveal" id="terms">
+      <h3 class="card-title">Key terms</h3>
+      <div class="terms" id="termList"></div>
+    </article>
+  </div>
+</section>
+
+<!-- PHASES -->
+<section id="phases" class="section">
+  <div class="sec-head">
+    <span class="sec-num">02</span>
+    <h2>Phases of Ethical Hacking <span class="tag">P.T.E.S.T</span></h2>
+    <p class="sec-lead">Click any phase to open it. Engagements run left to right — and the final phase is the one that actually pays the client.</p>
+  </div>
+
+  <div class="phase-rail" id="phaseRail"></div>
+  <div class="phase-detail" id="phaseDetail" aria-live="polite"></div>
+</section>
+
+<!-- RECON -->
+<section id="recon" class="section">
+  <div class="sec-head">
+    <span class="sec-num">03</span>
+    <h2>Information Gathering</h2>
+    <p class="sec-lead">Two ways to learn about a target: never touch it, or touch it carefully.</p>
+  </div>
+
+  <div class="two-col">
+    <article class="card reveal">
+      <div class="card-flag">01 · PASSIVE</div>
+      <h3 class="card-title">Without interacting</h3>
+      <p class="card-note">No packets sent to the target. Invisible in their logs.</p>
+      <ul class="chip-list">
+        <li>Whois lookup</li><li>Google dorking</li><li>Social media</li><li>Website / DNS / IP info</li>
+      </ul>
+      <div class="code-line"><code>whois acme-corp.com</code><button class="copy" data-copy="whois acme-corp.com">copy</button></div>
+      <div class="code-line"><code>site:acme-corp.com filetype:pdf</code><button class="copy" data-copy="site:acme-corp.com filetype:pdf">copy</button></div>
+    </article>
+
+    <article class="card reveal">
+      <div class="card-flag warn">02 · ACTIVE</div>
+      <h3 class="card-title">Interacting directly</h3>
+      <p class="card-note">You send traffic. It is loud, it is logged — stay inside scope.</p>
+      <ul class="chip-list">
+        <li>Ping sweep</li><li>Port scanning</li><li>Network mapping</li><li>Banner grabbing</li>
+      </ul>
+      <div class="code-line"><code>nmap -sn 10.10.0.0/24</code><button class="copy" data-copy="nmap -sn 10.10.0.0/24">copy</button></div>
+      <div class="code-line"><code>nc -v acme-corp.com 22</code><button class="copy" data-copy="nc -v acme-corp.com 22">copy</button></div>
+    </article>
+  </div>
+
+  <p class="footnote">OSINT (Open Source Intelligence) belongs to the passive column — everything the internet has already published about your target.</p>
+</section>
+
+<!-- SCANNING -->
+<section id="scanning" class="section">
+  <div class="sec-head">
+    <span class="sec-num">04</span>
+    <h2>Scanning</h2>
+    <p class="sec-lead">Turning a vague address range into a precise map of what is alive, open and outdated.</p>
+  </div>
+
+  <div class="scan-layout">
+    <ol class="scan-steps" id="scanSteps"></ol>
+
+    <div class="radar-wrap">
+      <div class="radar">
+        <svg viewBox="0 0 200 200" class="radar-svg" aria-hidden="true">
+          <circle cx="100" cy="100" r="94" class="ring"/>
+          <circle cx="100" cy="100" r="66" class="ring"/>
+          <circle cx="100" cy="100" r="38" class="ring"/>
+          <circle cx="100" cy="100" r="10" class="ring"/>
+          <line x1="100" y1="6" x2="100" y2="194" class="cross"/>
+          <line x1="6" y1="100" x2="194" y2="100" class="cross"/>
+          <g class="sweep"><path d="M100 100 L100 6 A94 94 0 0 1 168 32 Z"/></g>
+        </svg>
+        <span class="blip" style="--x:62%;--y:33%;--d:0s"></span>
+        <span class="blip" style="--x:34%;--y:58%;--d:.7s"></span>
+        <span class="blip" style="--x:71%;--y:69%;--d:1.4s"></span>
+        <span class="blip" style="--x:48%;--y:22%;--d:2.1s"></span>
+      </div>
+      <p class="radar-cap"><b>Nmap</b> — the default answer to “what is out there?”</p>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section id="tools" class="section">
+  <div class="sec-head">
+    <span class="sec-num">05</span>
+    <h2>Common Tools</h2>
+    <p class="sec-lead">Filter the arsenal, then copy a starting command.</p>
+  </div>
+
+  <div class="filters" id="toolFilters"></div>
+  <div class="tool-grid" id="toolGrid"></div>
+</section>
+
+<!-- ATTACKS -->
+<section id="attacks" class="section">
+  <div class="sec-head">
+    <span class="sec-num">06</span>
+    <h2>Types of Attacks</h2>
+    <p class="sec-lead">Five families — the variants from the notes, plus how each one is defended.</p>
+  </div>
+  <div class="attack-grid" id="attackGrid"></div>
+</section>
+
+<!-- PRINCIPLES + CIA + TIPS -->
+<section id="cia" class="section">
+  <div class="sec-head">
+    <span class="sec-num">07</span>
+    <h2>Principles, CIA Triad &amp; Field Tips</h2>
+    <p class="sec-lead">The part that keeps the work legal, useful and repeatable.</p>
+  </div>
+
+  <div class="three-col">
+    <article class="card reveal">
+      <h3 class="card-title">Principles</h3>
+      <ul class="check-list" id="principleList"></ul>
+      <p class="card-note small">Tick them off — all five hold on every engagement.</p>
+    </article>
+
+    <article class="card reveal triad-card">
+      <h3 class="card-title">CIA Triad</h3>
+      <div class="triad">
+        <svg viewBox="0 0 300 268" class="triad-svg">
+          <polygon points="150,40 268,226 32,226" class="tri" />
+          <text x="150" y="148" class="tri-label">CIA</text>
+          <text x="150" y="170" class="tri-label sm">TRIAD</text>
+          <text x="150" y="22" class="cap" text-anchor="middle">Confidentiality</text>
+          <text x="30" y="252" class="cap" text-anchor="start">Integrity</text>
+          <text x="270" y="252" class="cap" text-anchor="end">Availability</text>
+          <circle cx="150" cy="40" r="8" class="node" data-key="c" tabindex="0" role="button" aria-label="Confidentiality"/>
+          <circle cx="32" cy="226" r="8" class="node" data-key="i" tabindex="0" role="button" aria-label="Integrity"/>
+          <circle cx="268" cy="226" r="8" class="node" data-key="a" tabindex="0" role="button" aria-label="Availability"/>
+        </svg>
+        <div class="triad-info" id="triadInfo"></div>
+      </div>
+    </article>
+
+    <article class="card reveal">
+      <h3 class="card-title">Important tips</h3>
+      <ol class="num-list">
+        <li>Always get permission — in writing, before anything else.</li>
+        <li>Follow the rules of engagement, to the letter.</li>
+        <li>Document everything as you go, not afterwards.</li>
+        <li>Think like an attacker, act like a defender.</li>
+        <li>Keep learning and stay updated.</li>
+      </ol>
+      <div class="warn-box">
+        No authorization = no engagement. Unauthorized access is a crime regardless of intent.
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz" class="section">
+  <div class="sec-head">
+    <span class="sec-num">08</span>
+    <h2>Check Yourself</h2>
+    <p class="sec-lead">Eight questions straight from the notes.</p>
+  </div>
+  <div class="quiz" id="quizBox"></div>
+</section>
+
+<!-- CLOSING -->
+<section class="closing">
+  <p class="closing-quote">
+    Ethical hacking is not about breaking laws —<br />
+    it is about making the digital world <span class="hl">safer</span>.
+    <span class="star" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="22" height="22">
+        <path d="M12 2.6l2.9 6.1 6.7.9-4.9 4.6 1.2 6.6-5.9-3.2-5.9 3.2 1.2-6.6-4.9-4.6 6.7-.9z"
+              fill="currentColor"/>
+      </svg>
+    </span>
+  </p>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div>
+    <b>ETHICAL HACKING · INTERACTIVE FIELD NOTES</b>
+    <p>Built from a one-page handwritten cheat sheet. Study material only — practise exclusively on systems you own or are explicitly authorized to test.</p>
+  </div>
+  <div class="footer-legal">
+    <span class="pill">for education</span>
+    <span class="pill">get permission</span>
+    <span class="pill">document everything</span>
+  </div>
+</footer>
+
+<button class="totop" id="toTop" aria-label="Back to top">
+  <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+    <path d="M12 19V5m0 0-6.5 6.5M12 5l6.5 6.5" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+</button>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
